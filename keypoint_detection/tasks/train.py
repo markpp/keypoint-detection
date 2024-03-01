@@ -65,6 +65,7 @@ def train(hparams: dict) -> Tuple[KeypointDetector, pl.Trainer]:
 
     # use deterministic algorithms for torch to ensure exact reproducibility
     # we have to set it in the trainer! (see create_pl_trainer)
+
     if hparams["wandb_checkpoint_artifact"] is not None:
         print("Loading checkpoint from wandb")
         # This will create a KeypointDetector model with the associated hyperparameters.
@@ -79,8 +80,10 @@ def train(hparams: dict) -> Tuple[KeypointDetector, pl.Trainer]:
 
     data_module = KeypointsDataModule(**hparams)
     wandb_logger = WandbLogger(
-        project=hparams["wandb_project"],
-        entity=hparams["wandb_entity"],
+        # these are already set in the wandb init (to start from a sweep config)
+        # name=hparams["wandb_name"],
+        # project=hparams["wandb_project"],
+        # entity=hparams["wandb_entity"],
         save_dir=get_wandb_log_dir_path(),
         log_model=True,  # only log checkpoints at the end of training, i.e. only log the best checkpoint
         # not suitable for expensive training runs where you might want to restart from checkpoint
@@ -98,7 +101,11 @@ def train(hparams: dict) -> Tuple[KeypointDetector, pl.Trainer]:
         ckpt_path = trainer.checkpoint_callback.best_model_path
         if ckpt_path == "":
             print("No best checkpoint found, using current weights for test set evaluation")
-        trainer.test(model, data_module, ckpt_path="best")
+            ckpt_path = None
+        else:
+            print(f"Using best checkpoint for test set evaluation: {ckpt_path}")
+            ckpt_path = "best"
+        trainer.test(model, data_module, ckpt_path=ckpt_path)
 
     return model, trainer
 
@@ -130,6 +137,7 @@ def train_cli():
     # these can then be found in the 'config'
     # (so wandb params > argparse)
     wandb.init(
+        name=hparams["wandb_name"],
         project=hparams["wandb_project"],
         entity=hparams["wandb_entity"],
         config=hparams,
