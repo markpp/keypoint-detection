@@ -20,27 +20,17 @@ def add_system_args(parent_parser: ArgumentParser) -> ArgumentParser:
     function that adds all system configuration (hyper)parameters to the provided argumentparser
     """
     parser = parent_parser.add_argument_group("System")
-    parser.add_argument("--seed", default=2022, help="seed for reproducibility")
-    parser.add_argument(
-        "--wandb_project", default="keypoint-detection", help="The wandb project to log the results to"
-    )
-    parser.add_argument(
-        "--wandb_entity",
-        default=None,
-        help="The entity name to log the project against, can be simply set to your username if you have no dedicated entity for this project",
-    )
-    parser.add_argument(
-        "--wandb_name", default=None, help="The name of the run, if not specified, a random name will be generated"
-    )
-    parser.add_argument(
-        "--keypoint_channel_configuration",
-        type=str,
-        help="A list of the semantic keypoints that you want to learn in each channel. These semantic categories must be defined in the COCO dataset. Seperate the channels with a : and the categories within a channel with a =",
-    )
-
-    parser.add_argument(
-        "--early_stopping_relative_threshold",
-        default=-1.0,  # no early stopping by default
+    parser.add_argument("--seed", default=2023, help="seed for reproducibility")
+    parser.add_argument("--wandb_project", default="keypoint-detection", help="The wandb project to log the results to")
+    parser.add_argument("--wandb_entity", default="pp", help="The entity name to log the project against, can be simply set to your username if you have no dedicated entity for this project",)
+    parser.add_argument("--wandb_name", default="lightning-keypoint", help="The name of the run, if not specified, a random name will be generated")
+    parser.add_argument("--keypoint_channel_configuration", 
+                        default="lightning-keypoint",
+                        type=str, 
+                        help="A list of the semantic keypoints that you want to learn in each channel. \
+                              These semantic categories must be defined in the COCO dataset. \
+                              Seperate the channels with a : and the categories within a channel with a =",)
+    parser.add_argument("--early_stopping_relative_threshold", default=-1.0,  # no early stopping by default
         type=float,
         help="relative threshold for early stopping callback. If validation epoch loss does not increase with at least this fraction compared to the best result so far for 5 consecutive epochs, training is stopped.",
     )
